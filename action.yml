@@ -4,10 +4,18 @@ branding:
   icon: tag
   color: purple
 inputs:
+  repo:
+    description: "The repo with the issues that need label suggestions."
+    required: false
+    default: ${{ github.event.repository.name }}
+  owner:
+    description: "The repo owner's user ID."
+    required: false
+    default: ${{ github.repository_owner }}
   token:
     description: "Access token that can access the issues on the repo."
     required: false
-    default: '${{ github.token }}'
+    default: ${{ github.token }}
   api-key:
     description: "OpenAI API access key."
     required: true

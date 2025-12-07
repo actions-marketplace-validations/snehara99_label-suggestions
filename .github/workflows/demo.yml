@@ -9,9 +9,11 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-    - uses: snehara99/label-suggestions@0.0.12
+    - uses: snehara99/label-suggestions@0.0.13
       with:
-        token: ${{ github.token }} 
+        repo: 'vscode-cmake-tools'
+        owner: 'microsoft'
+        token: ${{ secrets.PAT }}
         api-key: ${{ secrets.API_KEY }}
         endpoint: 'https://americasopenai.azure-api.net'
         deployment-id: 'gpt-35-turbo-16k'

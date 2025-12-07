@@ -6,14 +6,10 @@ const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 
 async function run() {
   try {
-    const { owner, repo } = github.context.repo;
+    const repo = core.getInput('repo');
+    const owner = core.getInput('owner');
     const token = core.getInput('token');
     const octokit = github.getOctokit(token);
-
-    // const owner = 'microsoft';
-    // const repo = 'vscode-cmake-tools';
-    // const octokit = github.getOctokit(token);
-
 
     const issues = (
       await octokit.paginate(octokit.rest.issues.listForRepo, {
@@ -32,13 +28,9 @@ async function run() {
     ).map((i) => i.name)
       .join("', '");
 
-
     const apiKey = core.getInput('api-key');
     const endpoint = core.getInput('endpoint');
     const deploymentID = core.getInput('deployment-id');
-
-    // const endpoint = 'https://americasopenai.azure-api.net';
-    // const deploymentID =  'gpt-35-turbo-16k';
 
     const client = new OpenAIClient(
       endpoint,
@@ -47,8 +39,8 @@ async function run() {
 
     var issueLabels = {};
 
-    // const delayMS = 1000;
-    // const delay = ms => new Promise(res => setTimeout(res, ms));
+    const delayMS = 500;
+    const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // iterate through issues to label
     for (const issue of issues) {
@@ -64,8 +56,6 @@ async function run() {
         },
       ];
       messages.push({ role: "user", content: userMessageText });
-      console.log(deploymentID);
-      console.log(messages);
       const completion = await client.getChatCompletions(
         deploymentID,
         messages,
@@ -76,7 +66,6 @@ async function run() {
           maxTokens: 20
         }
       );
-      console.log(completion);
       const choice = completion.choices[0];
       issueLabels[
         issue.number
@@ -84,7 +73,7 @@ async function run() {
       console.log(
         `[ISSUE ${issue.number}] ${issue.title}\n${issue.html_url}\n${choice.message.content}\n`
       );
-      // await delay(delayMS);
+      await delay(delayMS);
     }
     core.setOutput("labels", issueLabels);
   } catch (error) {
